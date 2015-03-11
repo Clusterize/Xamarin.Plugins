@@ -9,6 +9,13 @@ namespace Refractored.Xam.Settings.Abstractions
   public interface ISettings
   {
     /// <summary>
+    /// Optional. Call this to enable serialization and deserialization of natively unsupported types.
+    /// </summary>
+    /// <param name="serializationFunc">Function to be used for serialization.</param>
+    /// <param name="deSerializationFunc">Function to be used for deserialization</param>
+    void Initialize(Func<object, string> serializationFunc, Func<string, Type, object> deSerializationFunc);
+
+    /// <summary>
     /// Gets the current value or the default that you specify.
     /// </summary>
     /// <typeparam name="T">Vaue of t (bool, int, float, long, string)</typeparam>

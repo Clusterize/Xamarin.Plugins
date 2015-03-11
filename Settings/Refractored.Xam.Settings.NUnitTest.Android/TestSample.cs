@@ -1,6 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using Refractored.Xam.Settings.Tests.Portable.Helpers;
+using Newtonsoft.Json;
 
 
 namespace Refractored.Xam.Settings.NUnitTest
@@ -10,7 +11,14 @@ namespace Refractored.Xam.Settings.NUnitTest
   {
 
     [SetUp]
-    public void Setup() { }
+    public void Setup() 
+    {
+      TestSettings.AppSettings = CrossSettings.Current;
+      TestSettings.AppSettings.Initialize (
+        JsonConvert.SerializeObject,
+        JsonConvert.DeserializeObject
+      );
+    }
 
 
     [TearDown]
@@ -91,6 +99,17 @@ namespace Refractored.Xam.Settings.NUnitTest
       Assert.True(TestSettings.GuidSetting.ToString() == test.ToString(), "Guid not saved");
     }
 
+    [Test]
+    public void Object()
+    {
+      TestObject test = new TestObject {
+        Name = "My object",
+        Value = 5
+      };
+
+      TestSettings.ObjectSetting = test;
+      Assert.AreEqual (TestSettings.ObjectSetting, test, "Object not saved");
+    }
 
     [Test]
     public void AddRemove()

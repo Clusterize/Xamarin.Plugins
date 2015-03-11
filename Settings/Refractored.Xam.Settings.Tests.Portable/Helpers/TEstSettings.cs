@@ -11,13 +11,7 @@ namespace Refractored.Xam.Settings.Tests.Portable.Helpers
   /// </summary>
   public static class TestSettings
   {
-    public static ISettings AppSettings
-    {
-      get
-      {
-        return CrossSettings.Current;
-      }
-    }
+    public static ISettings AppSettings { get; set; }
 
     #region Setting Constants
 
@@ -152,6 +146,18 @@ namespace Refractored.Xam.Settings.Tests.Portable.Helpers
       {
         //if value has changed then save it!
         AppSettings.AddOrUpdateValue(SettingsKey, value);
+      }
+    }
+
+    public static TestObject ObjectSetting
+    {
+      get
+      {
+        return AppSettings.GetValueOrDefault("object_setting", (TestObject)null);
+      }
+      set
+      {
+        AppSettings.AddOrUpdateValue("object_setting", value);
       }
     }
 

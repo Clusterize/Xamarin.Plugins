@@ -14,8 +14,21 @@ namespace Refractored.Xam.Settings
   /// </summary>
   public class Settings : ISettings
   {
+    private Func<string, Type, object> deserializationFunc;
+    private Func<object, string> serializationFunc;
 
     private readonly object locker = new object();
+
+    /// <summary>
+    /// Optional. Call this to enable serialization and deserialization of natively unsupported types.
+    /// </summary>
+    /// <param name="serializationFunc">Function to be used for serialization.</param>
+    /// <param name="deserializationFunc">Function to be used for deserialization</param>
+    public void Initialize (Func<object, string> serializationFunc, Func<string, Type, object> deserializationFunc)
+    {
+      this.serializationFunc = serializationFunc;
+      this.deserializationFunc = deserializationFunc;
+    }
 
     /// <summary>
     /// Gets the current value or the default that you specify.
@@ -98,9 +111,14 @@ namespace Refractored.Xam.Settings
                 value = outGuid;
               }
             }
+            else if (this.deserializationFunc != null)
+            {
+              var savedGeneric = defaults.StringForKey(key);
+              value = this.deserializationFunc(savedGeneric, typeOf);
+            }
             else
             {
-              throw new ArgumentException(string.Format("Value of type {0} is not supported.", value.GetType().Name));
+              throw new ArgumentException(string.Format("Value of type {0} is not supported. To enable generic deserialization, use ISettings.Initialize.", value.GetType().Name));
             }
 
             break;
@@ -186,9 +204,13 @@ namespace Refractored.Xam.Settings
 
               defaults.SetString(((Guid)value).ToString(), key);
             }
+            else if (this.serializationFunc != null)
+            {
+              defaults.SetString(this.serializationFunc(value), key);
+            }
             else
             {
-              throw new ArgumentException(string.Format("Value of type {0} is not supported.", value.GetType().Name));
+              throw new ArgumentException(string.Format("Value of type {0} is not supported. To enable string serialization, use ISettings.Initialize.", value.GetType().Name));
             }
             break;
         }
